@@ -11,7 +11,7 @@
 
 nav:
   # Navigation bar logo image
-  logo:
+  logo: /img/aster-icon.jpg
   display_title: true
   display_post_title: true
   # Whether to fix navigation bar
@@ -56,7 +56,7 @@ social:
 favicon: /img/favicon.png
 
 avatar:
-  img: /img/butterfly-icon.png
+  img: /img/aster-icon.jpg
   effect: false
 
 # Disable all banner images
@@ -66,7 +66,7 @@ disable_top_img: false
 default_top_img:
 
 # The banner image of index page
-index_img:
+index_img: /img/top-img.jpg
 
 # The banner image of archive page
 archive_img:

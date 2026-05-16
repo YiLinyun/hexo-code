@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="zn-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>AsterBlog</title><meta name="author" content="Aster"><meta name="copyright" content="Aster"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
+<meta property="og:title" content="AsterBlog">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="AsterBlog">
+<meta property="og:locale" content="zn_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:author" content="Aster">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "AsterBlog",
+  "alternateName": [
+    "example.com"
+  ],
+  "url": "http://example.com/"
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.5-b1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'AsterBlog',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'home'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="page" id="body-wrap"><header class="full_page" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">AsterBlog</span></a></span><div id="menus"></div></nav><div id="site-info"><h1 id="site-title">AsterBlog</h1></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts nc" id="recent-posts"><div class="recent-post-items"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/%E5%BC%82%E5%B8%B8%E7%9A%84%E6%94%BE%E7%BD%AE%E4%BD%8D%E7%BD%AE/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:16.658Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></span></div><div class="content"> 在 Java Web 应用（尤其是 Spring Boot&#x2F;Spring MVC）的典型分层架构中，异常处理的职责是分层的，通常建议的做法是： 核心原则：  Service 层： 抛出异常。 Controller 层： 捕获异常并将其转化为对用户友好的响应。 全局异常处理器： 处理跨越多个 Controller 的通用异常或 Controller 未处理的异常。  📍 详细说明📍 1. Service 层 - 负责抛出异常-    职责：  处理核心业务逻辑和数据访问。  在遇到业务规则违反、数据验证失败、数据访问错误、外部服务调用失败等异常情况时，抛出相应的已检查或未检查异常。     抛出的异常类型：  自定义业务异常： 如 UserNotFoundException, InsufficientBalanceException, ProductNotActiveException 等。这些异常应该清楚地表明业务逻辑出错的原因。  已检查异常： 如 IOException, SQLException（但通常推荐将其包装成未检查异常，见下一点）。  未检查异常： ...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/%E4%B9%B1%E8%B5%B7%E5%85%AB%E7%B3%9F%E7%9A%84%E8%AE%B0%E5%BD%95/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:16.651Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></span></div><div class="content"> 1.更新数据时如果数据库只有一条数据 那么直接更新就行。如果数据库是多条数据 那么推荐删除原本的数据 重新添加新的数据  </div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/XML%20%20CDATA/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:16.639Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></span></div><div class="content">  MyBatis XML 特殊字符处理：为什么必须使用 CDATA 包裹 &lt;= 作者：MyBatis 最佳实践​最后更新​：2025 年 7 月 31 日​关键词​：MyBatis, XML 解析, CDATA, SQL 特殊字符, 动态 SQL  问题背景：看似简单的运算符陷阱在 MyBatis 的 XML 映射文件中，以下两种写法看似等价： xml 复制 123456789&lt;!-- 错误写法 --&gt;&lt;if test=&quot;end != null&quot;&gt;    and e.entrydate &lt;= #&#123;end&#125;&lt;/if&gt;&lt;!-- 正确写法 --&gt;&lt;if test=&quot;end != null&quot;&gt;    and e.entrydate &lt;![CDATA[ &lt;= ]]&gt; #&#123;end&#125;&lt;/if&gt;  然而直接使用 &lt;= 会导致 XML 解析错误，使应用启动失败！ 根本原因：XML 解析规则冲突   运算符 问题...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/ThreadLocal/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:16.208Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></span></div><div class="content">   </div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/spring%E4%BA%8B%E5%8A%A1/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:16.201Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></span></div><div class="content"> Spring事务管理深度笔记一、核心概念1. ACID特性在Spring中的体现 **原子性(Atomicity)**：通过@Transactional保证操作要么全部成功，要么全部回滚 **一致性(Consistency)**：数据库约束+业务校验双重保障 **隔离性(Isolation)**：通过隔离级别控制并发访问 **持久性(Durability)**：事务提交后数据持久化到存储  2. 事务关键属性12345678@Transactional(    propagation = Propagation.REQUIRED, // 传播行为    isolation = Isolation.DEFAULT,      // 隔离级别    timeout = 30,                       // 超时时间(秒)    readOnly = false,                   // 只读事务    rollbackFor = Exception.class,      // 回滚异常    noRollbackFor = BusinessE...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/pageHelper/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:15.752Z" title="Created 2026-05-08 23:50:15">2026-05-08</time></span></div><div class="content"> PageHelper分页插件使用指南 本文档全面介绍PageHelper插件的核心功能、使用方法和注意事项，帮助开发者高效实现MyBatis分页  一、插件概述PageHelper是基于MyBatis的分页拦截器，通过动态改写SQL实现分页功能：  二、快速开始1. 添加依赖xml 复制 12345&lt;dependency&gt;    &lt;groupId&gt;com.github.pagehelper&lt;/groupId&gt;    &lt;artifactId&gt;pagehelper&lt;/artifactId&gt;    &lt;version&gt;5.3.2&lt;/version&gt; &lt;!-- 使用最新版本 --&gt;&lt;/dependency&gt;  2. 基本配置XML配置 (mybatis-config.xml): xml 复制 1234567&lt;plugins&gt;    &lt;plugin interceptor=&quot;com.github.pagehelper.PageInterceptor&quo...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/mysql%20-case/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:15.343Z" title="Created 2026-05-08 23:50:15">2026-05-08</time></span></div><div class="content"> markdown 复制 123456789101112131415&gt;# MySQL `CASE` 函数详解## 📌 核心功能`CASE` 是 MySQL 中的**条件表达式**，用于在查询中实现逻辑分支（类似编程中的 `if-else`/`switch`）&gt;## 📐 两种语法形式&gt;### 1. 简单 CASE 表达式（精确匹配）```sqlCASE 字段名    WHEN 值1 THEN 结果1      WHEN 值2 THEN 结果2    ...    ELSE 默认结果END  应用场景：字段值精确匹配时​示例​：  sql 复制 12345678SELECT     product_id,    CASE category_id         WHEN 1 THEN &#x27;电子产品&#x27;        WHEN 2 THEN &#x27;家居用品&#x27;        ELSE &#x27;其他&#x27;      END AS categoryFROM products;  2. 搜索 CASE 表达式（复杂条件）sql 复...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/Monitor/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:15.338Z" title="Created 2026-05-08 23:50:15">2026-05-08</time></span></div><div class="content"> 当一个Java对象被用作同步锁（例如通过synchronized关键字）时，其背后关联的Monitor（监视器&#x2F;管程）是实现同步的核心。这种关联主要是通过Java对象头中的Mark Word来实现的，整个过程涉及JVM底层精细的数据结构管理和状态转换。 为了让你快速把握全局，下表清晰地展示了对象与Monitor关联的核心机制和不同锁状态下Mark Word内容的变化。    核心组件&#x2F;锁状态 角色与功能 在关联过程中的关键作用    对象头 (Object Header) 每个Java对象的一部分，存储对象的元数据。 关联的基石，其中的Mark Word是关键。   Mark Word 对象头的一部分，用于动态存储对象的哈希码、GC年龄、锁状态标志等。 根据锁的竞争情况，存储不同的内容，是实现关联的“连接点”。   Monitor对象 (ObjectMonitor) JVM底层（C++）实现的一个数据结构，是真正的同步控制器。 关联的目标。在重量级锁状态下，由它来管理线程的互斥与协作。   无锁状态 对象未被锁定。 Mark Word存储哈希码、GC分代年龄...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/JWT/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:15.327Z" title="Created 2026-05-08 23:50:15">2026-05-08</time></span></div><div class="content">JWT 全面解析与安全实践指南 一、JWT 核心概念1. 本质与结构 • 定义：JSON Web Token（RFC 7519），用于安全传输声明的开放标准  • 格式：Header.Payload.Signature bash 复制 123eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.  # Header（Base64Url）eyJzdWIiOiIxMjM0IiwibmFtZSI6IkpvZGUifQ.  # Payload（Base64Url）SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c  # Signature     组成部分 内容说明 示例值    Header 算法+令牌类型 &#123;&quot;alg&quot;:&quot;HS256&quot;,&quot;typ&quot;:&quot;JWT&quot;&#125;   Payload 声明（Claims）：用户数据+系统声明 &#123;&quot;sub&quot;:&quot;123&quot;,&quot;role&quot;:...</div></div></div><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2026/05/08/git/" title="Untitled">Untitled</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2026-05-08T15:50:14.523Z" title="Created 2026-05-08 23:50:14">2026-05-08</time></span></div><div class="content">Git与GitHub操作笔记目录 Git基础概念 Git安装与配置 Git核心操作 分支管理 GitHub操作 高级操作 常见问题与解决方案 最佳实践   1.Git基础概念版本控制系统 分布式：每个开发者都有完整的仓库副本 快照式：记录文件状态而非差异  核心区域 **工作区 (Working Directory)**：本地文件系统 **暂存区 (Staging Area)**：准备提交的变更 **本地仓库 (Local Repository)**：完整的项目历史 **远程仓库 (Remote Repository)**：共享的中央仓库（如GitHub）  文件状态 **未跟踪 (Untracked)**：新文件，未被Git管理 **已修改 (Modified)**：文件内容已更改 **已暂存 (Staged)**：变更已添加到暂存区 **已提交 (Committed)**：变更已永久存储到本地仓库   2.Git安装与配置安装 Windows：下载 Git for Windows macOS：brew install git Linux：sudo apt install gi...</div></div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span><a class="page-number" href="/page/2/#content-inner">2</a><a class="extend next" rel="next" href="/page/2/#content-inner"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Aster</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/%E5%BC%82%E5%B8%B8%E7%9A%84%E6%94%BE%E7%BD%AE%E4%BD%8D%E7%BD%AE/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.658Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/%E4%B9%B1%E8%B5%B7%E5%85%AB%E7%B3%9F%E7%9A%84%E8%AE%B0%E5%BD%95/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.651Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/XML%20%20CDATA/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.639Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/ThreadLocal/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.208Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/spring%E4%BA%8B%E5%8A%A1/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.201Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div></div></div><div class="card-widget card-archives">
+    <div class="item-headline">
+      <i class="fas fa-archive"></i>
+      <span>Archives</span>
+      
+    </div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/05/">
+            <span class="card-archive-list-date">
+              May 2026
+            </span>
+            <span class="card-archive-list-count">12</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">12</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-05-08T16:07:12.163Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Aster</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.5-b1</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.5-b1"></script><script src="/js/main.js?v=5.5.5-b1"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

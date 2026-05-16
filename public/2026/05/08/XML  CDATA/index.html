@@ -1,0 +1,321 @@
+<!DOCTYPE html><html lang="zn-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>AsterBlog | AsterBlog</title><meta name="author" content="Aster"><meta name="copyright" content="Aster"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="MyBatis XML 特殊字符处理：为什么必须使用 CDATA 包裹 &lt;&#x3D; 作者：MyBatis 最佳实践​最后更新​：2025 年 7 月 31 日​关键词​：MyBatis, XML 解析, CDATA, SQL 特殊字符, 动态 SQL  问题背景：看似简单的运算符陷阱在 MyBatis 的 XML 映射文件中，以下两种写法看似等价： xml 复制 123456789&lt;!-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AsterBlog">
+<meta property="og:url" content="http://example.com/2026/05/08/XML%20%20CDATA/index.html">
+<meta property="og:site_name" content="AsterBlog">
+<meta property="og:description" content="MyBatis XML 特殊字符处理：为什么必须使用 CDATA 包裹 &lt;&#x3D; 作者：MyBatis 最佳实践​最后更新​：2025 年 7 月 31 日​关键词​：MyBatis, XML 解析, CDATA, SQL 特殊字符, 动态 SQL  问题背景：看似简单的运算符陷阱在 MyBatis 的 XML 映射文件中，以下两种写法看似等价： xml 复制 123456789&lt;!-">
+<meta property="og:locale" content="zn_CN">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2026-05-08T15:50:16.639Z">
+<meta property="article:modified_time" content="2025-07-31T01:24:42.000Z">
+<meta property="article:author" content="Aster">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "",
+  "url": "http://example.com/2026/05/08/XML%20%20CDATA/",
+  "image": "http://example.com/img/butterfly-icon.png",
+  "datePublished": "2026-05-08T15:50:16.639Z",
+  "dateModified": "2025-07-31T01:24:42.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Aster",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/05/08/XML%20%20CDATA/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.5-b1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'AsterBlog',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">AsterBlog</span></a><a class="nav-page-title" href="/"><span class="site-name">AsterBlog</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">Untitled</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-05-08T15:50:16.639Z" title="Created 2026-05-08 23:50:16">2026-05-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-07-31T01:24:42.000Z" title="Updated 2025-07-31 09:24:42">2025-07-31</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+</blockquote>
+<h1 id="MyBatis-XML-特殊字符处理：为什么必须使用-CDATA-包裹"><a href="#MyBatis-XML-特殊字符处理：为什么必须使用-CDATA-包裹" class="headerlink" title="MyBatis XML 特殊字符处理：为什么必须使用 CDATA 包裹 &lt;="></a>MyBatis XML 特殊字符处理：为什么必须使用 CDATA 包裹 <code>&lt;=</code></h1><blockquote>
+<p><strong>作者</strong>：MyBatis 最佳实践<br>​<strong>最后更新</strong>​：2025 年 7 月 31 日<br>​<strong>关键词</strong>​：MyBatis, XML 解析, CDATA, SQL 特殊字符, 动态 SQL</p>
+</blockquote>
+<h2 id="问题背景：看似简单的运算符陷阱"><a href="#问题背景：看似简单的运算符陷阱" class="headerlink" title="问题背景：看似简单的运算符陷阱"></a>问题背景：看似简单的运算符陷阱</h2><p>在 MyBatis 的 XML 映射文件中，以下两种写法看似等价：</p>
+<p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 错误写法 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;end != null&quot;</span>&gt;</span></span><br><span class="line">    and e.entrydate &lt;= #&#123;end&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 正确写法 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;end != null&quot;</span>&gt;</span></span><br><span class="line">    and e.entrydate &lt;![CDATA[ &lt;= ]]&gt; #&#123;end&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然而直接使用 <code>&lt;=</code> <strong>会导致 XML 解析错误</strong>，使应用启动失败！</p>
+<h2 id="根本原因：XML-解析规则冲突"><a href="#根本原因：XML-解析规则冲突" class="headerlink" title="根本原因：XML 解析规则冲突"></a>根本原因：XML 解析规则冲突</h2><table>
+<thead>
+<tr>
+<th align="center">运算符</th>
+<th align="center">问题根源</th>
+<th align="center">错误示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>&lt;=</code></td>
+<td align="center"><code>&lt;</code> 是 XML 标签起始符</td>
+<td align="center">XML 解析器尝试解释 <code>&lt;=</code> 为新标签</td>
+</tr>
+<tr>
+<td align="center"><code>&gt;=</code></td>
+<td align="center"><code>&gt;</code> 在特定上下文中可能引发歧义</td>
+<td align="center">结束标签意外终止</td>
+</tr>
+<tr>
+<td align="center"><code>&amp;</code></td>
+<td align="center">XML 实体引用起始符</td>
+<td align="center"><code>&amp;</code> 后接字符可能被解释为实体</td>
+</tr>
+</tbody></table>
+<p><strong>直接后果</strong>：</p>
+<p>复制</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.xml.sax.SAXParseException: The element type &quot;&lt;=&quot; must be followed by either attribute specifications, &quot;&gt;&quot; or &quot;/&gt;&quot;.</span><br></pre></td></tr></table></figure>
+
+<h2 id="解决方案：CDATA-保护机制"><a href="#解决方案：CDATA-保护机制" class="headerlink" title="解决方案：CDATA 保护机制"></a>解决方案：CDATA 保护机制</h2><h3 id="什么是-CDATA？"><a href="#什么是-CDATA？" class="headerlink" title="什么是 CDATA？"></a>什么是 CDATA？</h3><p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;![CDATA[ 任何内容都不会被XML解析器解析 ]]&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h3><p><img src="C:\Users\admin\OneDrive\博客文章准备\img\11.png" alt="11"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="关键保护机制："><a href="#关键保护机制：" class="headerlink" title="关键保护机制："></a>关键保护机制：</h3><ol>
+<li>将运算符从 <strong>标签语法领域</strong> 转移到 <strong>纯文本领域</strong></li>
+<li>禁用所有特殊字符的 XML 含义</li>
+<li>保持 SQL 代码原始形态（无转义需求）</li>
+</ol>
+<h2 id="替代方案对比（不推荐）"><a href="#替代方案对比（不推荐）" class="headerlink" title="替代方案对比（不推荐）"></a>替代方案对比（不推荐）</h2><h3 id="XML-实体转义写法"><a href="#XML-实体转义写法" class="headerlink" title="XML 实体转义写法"></a>XML 实体转义写法</h3><p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">and e.entrydate <span class="symbol">&amp;lt;</span>= #&#123;end&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="center">方案</th>
+<th align="center">可读性</th>
+<th align="center">维护成本</th>
+<th align="center">错误风险</th>
+<th align="center">适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CDATA</td>
+<td align="center">★★★</td>
+<td align="center">★★</td>
+<td align="center">低</td>
+<td align="center">含特殊字符的代码块</td>
+</tr>
+<tr>
+<td align="center">实体转义</td>
+<td align="center">★</td>
+<td align="center">★★★</td>
+<td align="center">高</td>
+<td align="center">单个简单字符</td>
+</tr>
+<tr>
+<td align="center">纯文本(无动态)</td>
+<td align="center">★★★</td>
+<td align="center">★</td>
+<td align="center">无</td>
+<td align="center">完全静态 SQL</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>🚫 转义方案缺点：</p>
+<ul>
+<li><code>&lt;=</code> 破坏 SQL 可读性</li>
+<li>需人工确保所有特殊字符都被转义</li>
+<li>复杂表达式易遗漏转义（如 <code>(a &lt; b OR c &gt; d)</code>）</li>
+</ul>
+</blockquote>
+<h2 id="最佳实践指南"><a href="#最佳实践指南" class="headerlink" title="最佳实践指南"></a>最佳实践指南</h2><h3 id="1-动态-SQL-片段标准写法"><a href="#1-动态-SQL-片段标准写法" class="headerlink" title="1. 动态 SQL 片段标准写法"></a>1. 动态 SQL 片段标准写法</h3><p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findEmployees&quot;</span>&gt;</span></span><br><span class="line">    SELECT * FROM employee</span><br><span class="line">    <span class="tag">&lt;<span class="name">where</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;start != null&quot;</span>&gt;</span></span><br><span class="line">            &lt;![CDATA[ AND e.entrydate &gt;= #&#123;start&#125; ]]&gt;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;end != null&quot;</span>&gt;</span></span><br><span class="line">            &lt;![CDATA[ AND e.entrydate &lt;= #&#123;end&#125; ]]&gt;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">where</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-完整-SQL-块保护（适用于静态语句）"><a href="#2-完整-SQL-块保护（适用于静态语句）" class="headerlink" title="2. 完整 SQL 块保护（适用于静态语句）"></a>2. 完整 SQL 块保护（适用于静态语句）</h3><p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getRecentHires&quot;</span>&gt;</span></span><br><span class="line">    &lt;![CDATA[</span><br><span class="line">        SELECT id, name, </span><br><span class="line">               entrydate </span><br><span class="line">        FROM employee </span><br><span class="line">        WHERE entrydate &lt;= NOW() </span><br><span class="line">          AND status = &#x27;A&#x27;</span><br><span class="line">        ORDER BY entrydate DESC</span><br><span class="line">    ]]&gt;</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-需要保护的特殊字符列表"><a href="#3-需要保护的特殊字符列表" class="headerlink" title="3. 需要保护的特殊字符列表"></a>3. 需要保护的特殊字符列表</h3><table>
+<thead>
+<tr>
+<th align="center">字符</th>
+<th align="center">在SQL中的常见用途</th>
+<th align="center">是否必须CDATA保护</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>&lt;</code></td>
+<td align="center">小于(&lt;&#x3D;), 日期比较</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="center"><code>&gt;</code></td>
+<td align="center">大于(&gt;&#x3D;), 比较运算符</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="center"><code>&amp;</code></td>
+<td align="center">位运算(&amp;), UNION ALL</td>
+<td align="center">是</td>
+</tr>
+<tr>
+<td align="center"><code>&quot;</code></td>
+<td align="center">字符串常量</td>
+<td align="center">视上下文而定</td>
+</tr>
+<tr>
+<td align="center"><code>&#39;</code></td>
+<td align="center">字符串常量</td>
+<td align="center">通常不需要</td>
+</tr>
+</tbody></table>
+<h3 id="4-异常检测技巧"><a href="#4-异常检测技巧" class="headerlink" title="4. 异常检测技巧"></a>4. 异常检测技巧</h3><p>当看到以下错误时，立即检查特殊字符保护：</p>
+<p>复制</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Caused by: org.xml.sax.SAXParseException: </span><br><span class="line"><span class="code">    Element type &quot;=&quot; must be followed by either attribute specifications...</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="实战示例对比"><a href="#实战示例对比" class="headerlink" title="实战示例对比"></a>实战示例对比</h2><h3 id="错误实现导致的问题"><a href="#错误实现导致的问题" class="headerlink" title="错误实现导致的问题"></a>错误实现导致的问题</h3><p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 漏洞代码：XML解析器将尝试解析 &lt;= --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;maxSalary != null&quot;</span>&gt;</span></span><br><span class="line">    AND salary &lt;= #&#123;maxSalary&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong>：应用启动失败，SAXParseException 异常</p>
+<h3 id="CDATA-保护的健壮实现"><a href="#CDATA-保护的健壮实现" class="headerlink" title="CDATA 保护的健壮实现"></a>CDATA 保护的健壮实现</h3><p>xml</p>
+<p>复制</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 安全代码：特殊字符被正确隔离 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;maxSalary != null&quot;</span>&gt;</span></span><br><span class="line">    &lt;![CDATA[ AND salary &lt;= #&#123;maxSalary&#125; ]]&gt;</span><br><span class="line"><span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运行结果</strong>：生成预期SQL → <code>AND salary &lt;= 10000</code></p>
+<h2 id="核心总结"><a href="#核心总结" class="headerlink" title="核心总结"></a>核心总结</h2><ol>
+<li><strong>CDATA 不是可选项</strong><br>对于包含 <code>&lt;</code>、<code>&gt;</code>、<code>&amp;</code> 的动态 SQL 片段，CDATA 是必要防护</li>
+<li><strong>本质是 XML 特性</strong><br>该要求由 XML 规范驱动（非 MyBatis 限制）</li>
+<li><strong>预防 &gt; 修复</strong><br>建立编码规范：所有比较运算符自动加 CDATA 保护</li>
+<li><strong>现代 IDE 辅助</strong><br>推荐使用支持 XML 验证的 IDE（如 IntelliJ IDEA），可实时标出未受保护的运算符</li>
+</ol>
+<blockquote>
+<p>💡 <strong>专家提示</strong>：即使是经验丰富的开发者也可能忘记此规则。建议在团队代码评审中将此作为必须检查项！</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Aster</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2026/05/08/XML%20%20CDATA/">http://example.com/2026/05/08/XML%20%20CDATA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/05/08/%E4%B9%B1%E8%B5%B7%E5%85%AB%E7%B3%9F%E7%9A%84%E8%AE%B0%E5%BD%95/" title=""><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2"></div></div><div class="info-2"><div class="info-item-1"> 1.更新数据时如果数据库只有一条数据 那么直接更新就行。如果数据库是多条数据 那么推荐删除原本的数据 重新添加新的数据  </div></div></div></a><a class="pagination-related" href="/2026/05/08/ThreadLocal/" title=""><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2"></div></div><div class="info-2"><div class="info-item-1">   </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Aster</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#MyBatis-XML-%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E5%A4%84%E7%90%86%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E9%A1%BB%E4%BD%BF%E7%94%A8-CDATA-%E5%8C%85%E8%A3%B9"><span class="toc-number">1.</span> <span class="toc-text">MyBatis XML 特殊字符处理：为什么必须使用 CDATA 包裹 &lt;&#x3D;</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF%EF%BC%9A%E7%9C%8B%E4%BC%BC%E7%AE%80%E5%8D%95%E7%9A%84%E8%BF%90%E7%AE%97%E7%AC%A6%E9%99%B7%E9%98%B1"><span class="toc-number">1.1.</span> <span class="toc-text">问题背景：看似简单的运算符陷阱</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B9%E6%9C%AC%E5%8E%9F%E5%9B%A0%EF%BC%9AXML-%E8%A7%A3%E6%9E%90%E8%A7%84%E5%88%99%E5%86%B2%E7%AA%81"><span class="toc-number">1.2.</span> <span class="toc-text">根本原因：XML 解析规则冲突</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9ACDATA-%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6"><span class="toc-number">1.3.</span> <span class="toc-text">解决方案：CDATA 保护机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-CDATA%EF%BC%9F"><span class="toc-number">1.3.1.</span> <span class="toc-text">什么是 CDATA？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.2.</span> <span class="toc-text">工作原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6%EF%BC%9A"><span class="toc-number">1.3.3.</span> <span class="toc-text">关键保护机制：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%BF%E4%BB%A3%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%EF%BC%88%E4%B8%8D%E6%8E%A8%E8%8D%90%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">替代方案对比（不推荐）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#XML-%E5%AE%9E%E4%BD%93%E8%BD%AC%E4%B9%89%E5%86%99%E6%B3%95"><span class="toc-number">1.4.1.</span> <span class="toc-text">XML 实体转义写法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%8C%87%E5%8D%97"><span class="toc-number">1.5.</span> <span class="toc-text">最佳实践指南</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%8A%A8%E6%80%81-SQL-%E7%89%87%E6%AE%B5%E6%A0%87%E5%87%86%E5%86%99%E6%B3%95"><span class="toc-number">1.5.1.</span> <span class="toc-text">1. 动态 SQL 片段标准写法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%AE%8C%E6%95%B4-SQL-%E5%9D%97%E4%BF%9D%E6%8A%A4%EF%BC%88%E9%80%82%E7%94%A8%E4%BA%8E%E9%9D%99%E6%80%81%E8%AF%AD%E5%8F%A5%EF%BC%89"><span class="toc-number">1.5.2.</span> <span class="toc-text">2. 完整 SQL 块保护（适用于静态语句）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E9%9C%80%E8%A6%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8"><span class="toc-number">1.5.3.</span> <span class="toc-text">3. 需要保护的特殊字符列表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E6%8A%80%E5%B7%A7"><span class="toc-number">1.5.4.</span> <span class="toc-text">4. 异常检测技巧</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98%E7%A4%BA%E4%BE%8B%E5%AF%B9%E6%AF%94"><span class="toc-number">1.6.</span> <span class="toc-text">实战示例对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF%E5%AE%9E%E7%8E%B0%E5%AF%BC%E8%87%B4%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.6.1.</span> <span class="toc-text">错误实现导致的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CDATA-%E4%BF%9D%E6%8A%A4%E7%9A%84%E5%81%A5%E5%A3%AE%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.6.2.</span> <span class="toc-text">CDATA 保护的健壮实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%BB%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">核心总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/%E5%BC%82%E5%B8%B8%E7%9A%84%E6%94%BE%E7%BD%AE%E4%BD%8D%E7%BD%AE/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.658Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/%E4%B9%B1%E8%B5%B7%E5%85%AB%E7%B3%9F%E7%9A%84%E8%AE%B0%E5%BD%95/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.651Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/XML%20%20CDATA/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.639Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/ThreadLocal/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.208Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/08/spring%E4%BA%8B%E5%8A%A1/" title="Untitled">Untitled</a><time datetime="2026-05-08T15:50:16.201Z" title="Created 2026-05-08 23:50:16">2026-05-08</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Aster</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.5-b1</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.5-b1"></script><script src="/js/main.js?v=5.5.5-b1"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Asteryn avatar">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#1d3557"/>
+      <stop offset="0.48" stop-color="#2a9d8f"/>
+      <stop offset="1" stop-color="#e9c46a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="35%" r="58%">
+      <stop offset="0" stop-color="#fff8d6" stop-opacity=".95"/>
+      <stop offset=".34" stop-color="#f4a261" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#f4a261" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="132" fill="#10141d"/>
+  <circle cx="256" cy="238" r="178" fill="url(#sky)"/>
+  <circle cx="256" cy="238" r="144" fill="url(#glow)"/>
+  <path d="M128 340c42-72 92-108 151-108 42 0 78 18 108 55 19 23 36 52 50 88H99c7-13 17-25 29-35z" fill="#f8fafc" opacity=".96"/>
+  <path d="M174 297c24-47 52-71 84-71 25 0 47 14 66 41 13 19 25 42 36 70H151c6-15 14-28 23-40z" fill="#1d3557" opacity=".92"/>
+  <path d="M119 371h274c16 0 30 10 35 25l12 34H72l15-36c6-14 18-23 32-23z" fill="#f4a261"/>
+  <path d="M219 115l20 56 59-2-46 36 21 55-49-32-47 36 14-58-49-32 59-4z" fill="#fff8d6"/>
+</svg>

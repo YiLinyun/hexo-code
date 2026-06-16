@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Asteryn page banner">
+  <defs>
+    <linearGradient id="b" x1="0" x2="1">
+      <stop offset="0" stop-color="#1d3557"/>
+      <stop offset=".5" stop-color="#287271"/>
+      <stop offset="1" stop-color="#e76f51"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="520" fill="url(#b)"/>
+  <path d="M0 360c185-70 333-73 444-10 112 64 228 56 348-24 161-107 313-95 457 35 105 95 222 116 351 63v96H0z" fill="#111827" opacity=".58"/>
+  <path d="M164 115h520M164 178h380M164 241h466" stroke="#fff8d6" stroke-width="9" stroke-linecap="round" opacity=".24"/>
+  <path d="M1268 91l25 69 73-3-57 44 25 69-61-40-59 45 18-71-60-41 73-3z" fill="#fff8d6" opacity=".86"/>
+</svg>

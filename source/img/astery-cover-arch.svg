@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Architecture article cover">
+  <rect width="960" height="540" fill="#f7fbfa"/>
+  <path d="M90 390h780" stroke="#1d3557" stroke-width="18" stroke-linecap="round" opacity=".18"/>
+  <rect x="122" y="144" width="168" height="112" rx="22" fill="#2a9d8f"/>
+  <rect x="396" y="102" width="168" height="112" rx="22" fill="#1d3557"/>
+  <rect x="670" y="144" width="168" height="112" rx="22" fill="#e76f51"/>
+  <rect x="256" y="324" width="168" height="112" rx="22" fill="#e9c46a"/>
+  <rect x="536" y="324" width="168" height="112" rx="22" fill="#287271"/>
+  <path d="M290 200h106M564 158h106M480 214v110M340 324l140-110M620 324 480 214" fill="none" stroke="#10141d" stroke-width="14" stroke-linecap="round" opacity=".45"/>
+  <circle cx="480" cy="214" r="16" fill="#f4a261"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Asteryn starry avatar">
+  <defs>
+    <linearGradient id="night" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset=".58" stop-color="#18385f"/>
+      <stop offset="1" stop-color="#2a9d8f"/>
+    </linearGradient>
+    <linearGradient id="snow" x1="0" x2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#07111f"/>
+  <circle cx="256" cy="256" r="190" fill="url(#night)" stroke="#e6eef7" stroke-width="14"/>
+  <circle cx="166" cy="144" r="5" fill="#fff7cc"/>
+  <circle cx="308" cy="102" r="3" fill="#fff7cc"/>
+  <circle cx="370" cy="178" r="4" fill="#fff7cc"/>
+  <path d="M249 92l12 34 36-1-29 21 12 35-31-21-29 22 9-36-30-21 37 1z" fill="#fff7cc"/>
+  <path d="M96 356 217 170l62 100 38-58 101 144H96z" fill="url(#snow)"/>
+  <path d="M217 170 96 356h162l-42-94 31 22 32-14-62-100z" fill="#f8fbff"/>
+  <path d="M279 270 317 212l101 144H258l35-56-14-30z" fill="#bfdbfe"/>
+  <path d="M126 390h260" stroke="#f4a261" stroke-width="18" stroke-linecap="round"/>
+</svg>

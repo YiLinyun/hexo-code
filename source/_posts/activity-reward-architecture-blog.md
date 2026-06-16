@@ -1,6 +1,8 @@
 ---
 title: 从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录
 date: 2026-06-16 10:30:00
+cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80'
+top_img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=85'
 categories:
   - 后端架构
 tags:

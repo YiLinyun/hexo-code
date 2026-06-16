@@ -1,0 +1,69 @@
+/* Asteryn: Butterfly theme polish.
+   这里放主题配置调不到的视觉细节；大部分颜色和图片仍在 _config.butterfly.yml 维护。 */
+
+:root {
+  --astery-card-shadow: 0 14px 38px rgba(16, 20, 29, 0.10);
+  --astery-card-shadow-hover: 0 18px 48px rgba(16, 20, 29, 0.16);
+}
+
+#nav.fixed {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+#site-info #site-title {
+  letter-spacing: 0;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+}
+
+#site-info #site-subtitle {
+  letter-spacing: 0;
+  text-shadow: 0 6px 22px rgba(0, 0, 0, 0.34);
+}
+
+#recent-posts > .recent-post-item,
+#aside-content .card-widget,
+.layout > div:first-child:not(.recent-posts),
+#post,
+#page,
+#archive {
+  box-shadow: var(--astery-card-shadow);
+  border: 1px solid rgba(42, 157, 143, 0.08);
+}
+
+#recent-posts > .recent-post-item {
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+
+#recent-posts > .recent-post-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--astery-card-shadow-hover);
+}
+
+#aside-content .card-info .author-info__name {
+  font-weight: 700;
+}
+
+#aside-content .card-info .author-info__description {
+  line-height: 1.65;
+}
+
+.article-sort-title,
+.article-title,
+#post-info .post-title {
+  letter-spacing: 0;
+}
+
+#post #article-container {
+  line-height: 1.9;
+}
+
+#article-container blockquote {
+  border-radius: 8px;
+}
+
+#footer {
+  background-size: cover;
+  background-position: center;
+}

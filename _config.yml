@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: AsterBlog
-subtitle: ''
-description: ''
-keywords:
-author: Aster
-language: zn-CN
+title: Asteryn
+subtitle: '把技术细节整理成可以反复阅读的笔记'
+description: 'Asteryn 的技术博客，记录后端架构、工程实践和问题复盘。'
+keywords: Java, Spring Boot, MyBatis, Hexo, Butterfly, 后端架构
+author: Asteryn
+language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL

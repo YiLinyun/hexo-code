@@ -1,6 +1,8 @@
 ---
 title: 推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达
 date: 2026-05-16 20:00:00
+cover: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1200&q=80'
+top_img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=2200&q=85'
 tags:
   - Hexo
 categories:

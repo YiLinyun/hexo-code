@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" preserveAspectRatio="none" role="img" aria-label="Asteryn site background">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7fbfa"/>
+      <stop offset=".54" stop-color="#eef7f4"/>
+      <stop offset="1" stop-color="#fff7ec"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <path d="M0 690c156-74 305-83 448-27 139 55 263 45 372-30 134-92 261-90 380 5v262H0z" fill="#2a9d8f" opacity=".07"/>
+</svg>

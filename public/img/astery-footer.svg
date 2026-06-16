@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Asteryn footer background">
+  <rect width="1600" height="420" fill="#10141d"/>
+  <path d="M0 250c208-98 384-105 528-21 118 69 239 61 363-24 157-108 319-91 486 51 74 62 148 86 223 72v92H0z" fill="#2a9d8f" opacity=".28"/>
+  <path d="M0 318c218-54 386-52 505 5 112 54 232 47 361-22 156-84 316-68 481 47 77 54 161 61 253 22v50H0z" fill="#e9c46a" opacity=".23"/>
+  <circle cx="1270" cy="98" r="5" fill="#fff8d6"/><circle cx="1372" cy="170" r="3" fill="#fff8d6"/><circle cx="1106" cy="142" r="4" fill="#fff8d6"/>
+</svg>

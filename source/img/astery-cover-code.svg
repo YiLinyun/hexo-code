@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Code article cover">
+  <rect width="960" height="540" rx="0" fill="#10141d"/>
+  <rect x="90" y="82" width="780" height="376" rx="28" fill="#f8fafc" opacity=".96"/>
+  <rect x="90" y="82" width="780" height="58" rx="28" fill="#1d3557"/>
+  <circle cx="130" cy="112" r="9" fill="#e76f51"/><circle cx="160" cy="112" r="9" fill="#e9c46a"/><circle cx="190" cy="112" r="9" fill="#2a9d8f"/>
+  <path d="M154 208h210M154 260h325M154 312h260M154 364h375" stroke="#1d3557" stroke-width="18" stroke-linecap="round" opacity=".72"/>
+  <path d="M590 207l-70 63 70 63M682 207l70 63-70 63" fill="none" stroke="#e76f51" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

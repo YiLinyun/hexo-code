@@ -1,0 +1,413 @@
+# --------------------------------------
+# Asteryn 的 Butterfly 主题覆盖配置
+# --------------------------------------
+# 维护说明：
+# 1. 这个文件名必须和根配置里的 theme: hexo-theme-butterfly-dev 对应。
+#    如果未来把主题目录改名为 butterfly，就把本文件同步改名为 _config.butterfly.yml。
+# 2. 这个文件会覆盖 themes/hexo-theme-butterfly-dev/_config.yml 里的同名配置。
+# 3. 后续升级 Butterfly 主题时，优先改这里，不要直接改主题目录里的 _config.yml。
+# 4. 本文件只放“和页面观感/常用维护有关”的配置；主题的冷门配置继续使用默认值。
+# 5. 本地图片都放在 source/img/，引用时写成 /img/文件名。
+
+# --------------------------------------
+# 顶部导航栏：页面最上方的站点标题、菜单、固定状态
+# --------------------------------------
+nav:
+  # 页面左上角的 Logo 小图；星空雪山风格的字母 A，和首页头图统一。
+  logo: /img/astery-avatar-starry.svg
+  # true = 导航栏显示站点标题 Asteryn；false = 只显示 logo。
+  display_title: true
+  # true = 文章页滚动后导航栏可显示当前文章标题。
+  display_post_title: true
+  # true = 导航栏固定在页面顶部；false = 向下滚动时会离开视口。
+  fixed: true
+
+menu:
+  # 首页：顶部导航栏里的“首页”入口。
+  首页: / || fas fa-home
+  # 归档：按时间线浏览全部文章。
+  归档: /archives/ || fas fa-archive
+  # 分类：按文章分类浏览，例如“后端架构”“博客”。
+  分类: /categories/ || fas fa-folder-open
+  # 标签：按标签浏览，例如 Java / Spring Boot / MyBatis。
+  标签: /tags/ || fas fa-tags
+
+# --------------------------------------
+# 站点图标与全站图片：浏览器标签页、首页大图、文章卡片封面、页脚背景
+# --------------------------------------
+# 浏览器标签页的小图标；后续可替换为 /img/favicon.png 或 ico 文件。
+favicon: /img/astery-avatar-starry.svg
+
+avatar:
+  # 侧边栏“作者信息卡”的头像，也是很多页面的个人识别图；这里使用星空雪山字母 A。
+  img: /img/astery-avatar-starry.svg
+  # false = 头像不转圈；true = 鼠标悬停时会有旋转动效。
+  effect: false
+
+# false = 保留各页面顶部横幅图；true = 全站隐藏顶部横幅图。
+disable_top_img: false
+
+# 页面没有单独设置 top_img 时使用的默认横幅图，影响归档/标签/分类等页面头图。
+# 当前风格：星空雪山，安静、克制，适合个人技术笔记。
+default_top_img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=2200&q=85'
+
+# 博客首页第一屏的大横幅图，最显眼；后续想换首页氛围图就改这里。
+# 当前风格：星空雪山/银河夜空，氛围安静、高级，适合长文阅读型博客。
+index_img: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=85'
+
+# 归档页顶部横幅图，访问 /archives/ 时显示。
+archive_img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=2200&q=85'
+
+# 标签页顶部横幅图，访问 /tags/ 或单个标签页时显示。
+tag_img: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=2200&q=85'
+
+# 分类页顶部横幅图，访问 /categories/ 或单个分类页时显示。
+category_img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2200&q=85'
+
+# 页脚背景图；星空雪山风格用暗色山景收尾，底部更有沉浸感。
+footer_img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=2200&q=80'
+
+# 页面主体背景：可以是颜色、图片 URL，或数组。这里用浅色渐变 SVG，避免纯白太空。
+background: /img/astery-bg.svg
+
+cover:
+  # 首页文章列表卡片是否显示文章封面图。
+  index_enable: true
+  # 侧边栏最近文章卡片是否显示缩略封面图。
+  aside_enable: true
+  # 归档页文章是否显示封面图。
+  archives_enable: true
+  # 当某篇文章 front-matter 没有写 cover 时，从这里按默认/随机方式补封面。
+  # 当前风格：星空、山脉、夜色，和首页氛围统一。
+  default_cover:
+    - 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1200&q=80'
+    - 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80'
+
+# --------------------------------------
+# 首页第一屏：站点标题、打字机副标题、文章列表布局
+# --------------------------------------
+# 首页标题区域距离顶部的位置；留空时主题居中显示。
+index_site_info_top:
+# 首页大图高度；100vh 表示占满浏览器第一屏，向下滚动后才看到文章列表。
+index_top_img_height: 100vh
+
+subtitle:
+  # 首页标题下方的打字机副标题开关。
+  enable: true
+  # true = 多条文案打字机轮播；false = 只显示第一条文案。
+  effect: true
+  typed_option:
+  # false = 不调用第三方一言接口，避免加载不稳定；只用下面 sub 里的自定义文案。
+  source: false
+  # 首页标题下的轮播短句，适合写博客定位、个人口号、当前阶段主题。
+  sub:
+    - 把系统设计讲清楚，也把踩坑过程留下来。
+    - 写给未来的自己，也写给正在排查问题的人。
+    - Java / Spring Boot / MyBatis / 架构复盘
+
+# 首页文章卡片布局：3 = 左右交错显示封面和摘要，比单列更有节奏。
+index_layout: 3
+
+index_post_content:
+  # 2 = 优先显示文章 description，没有 description 时自动截取正文。
+  method: 2
+  # 自动摘要长度，影响首页每篇文章卡片露出的文字量。
+  length: 220
+
+# --------------------------------------
+# 文章页：目录、版权、相关文章、上下篇入口
+# --------------------------------------
+toc:
+  # 文章页右侧目录开关。
+  post: true
+  # 普通页面是否也显示目录。
+  page: false
+  # 目录是否显示 1 / 1.1 这样的编号。
+  number: true
+  # false = 默认折叠子目录，页面更清爽。
+  expand: false
+  # true = 简洁目录样式；false = 使用主题默认目录样式。
+  style_simple: false
+  # true = 目录中显示当前阅读进度。
+  scroll_percent: true
+
+post_copyright:
+  # 文章底部版权信息，方便别人转载时知道来源。
+  enable: true
+  decode: false
+  author_href:
+  license: CC BY-NC-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+related_post:
+  # 文章底部的“相关文章”模块。
+  enable: true
+  # 显示相关文章数量。
+  limit: 4
+  # created = 按发布时间找关联；updated = 按更新时间。
+  date_type: created
+
+# 文章底部上下篇：1 = 上一篇指向更旧文章，下一篇指向更新文章。
+post_pagination: 1
+
+# --------------------------------------
+# 侧边栏：作者卡片、公告、最近文章、分类/标签/归档等卡片
+# --------------------------------------
+aside:
+  # true = 开启右侧栏；false = 全站隐藏侧边栏。
+  enable: true
+  # false = 默认展开；true = 默认收起。
+  hide: false
+  # 右下角显示“隐藏/显示侧边栏”的按钮。
+  button: true
+  # 手机端也显示侧边栏内容。
+  mobile: true
+  # right = 侧边栏在右；left = 侧边栏在左。
+  position: right
+  display:
+    # 归档页显示侧边栏。
+    archive: true
+    # 标签页显示侧边栏。
+    tag: true
+    # 分类页显示侧边栏。
+    category: true
+  card_author:
+    # 作者信息卡，通常是侧边栏第一张卡。
+    enable: true
+    # 头像下方的一句话简介。
+    description: 后端工程与系统设计笔记
+    button:
+      # 作者卡片里的按钮，适合放 GitHub / 邮箱 / 关于页。
+      enable: true
+      icon: fab fa-github
+      text: GitHub
+      link: https://github.com/YiLinyun
+  card_announcement:
+    # 公告卡，适合放博客当前主题、更新说明或联系方式。
+    enable: true
+    content: Asteryn 正在整理后端架构、活动系统、消息链路与工程实践。
+  card_recent_post:
+    # 最近文章卡。
+    enable: true
+    # 最近文章显示数量。
+    limit: 5
+    # date = 按发布时间；updated = 按更新时间。
+    sort: date
+    sort_order:
+  card_categories:
+    # 分类卡。
+    enable: true
+    limit: 8
+    # none = 不展开；true = 展开；false = 折叠。
+    expand: none
+    sort_order:
+  card_tags:
+    # 标签云卡。
+    enable: true
+    limit: 40
+    # true = 标签颜色随机；false = 使用统一主题色，更克制。
+    color: false
+    custom_colors:
+    # random/name/length：标签排序方式。
+    orderby: random
+    order: 1
+    sort_order:
+  card_archives:
+    # 归档卡。
+    enable: true
+    type: monthly
+    format: YYYY年 MM月
+    order: -1
+    limit: 8
+    sort_order:
+  card_webinfo:
+    # 站点信息卡，比如文章数、最后更新时间。
+    enable: true
+    post_count: true
+    last_push_date: true
+    sort_order:
+    runtime_date:
+
+# --------------------------------------
+# 右下角按钮：夜间模式、阅读模式、回到顶部等
+# --------------------------------------
+# 右下角按钮距离底部的距离，必须带单位；写 32 会导致 Butterfly 主 CSS 编译成空文件。
+rightside_bottom: 32px
+
+readmode: true
+
+darkmode:
+  # 开启深色模式按钮。
+  enable: true
+  button: true
+  # false = 不自动切换；用户手动选择更可控。
+  autoChangeMode: false
+  start:
+  end:
+
+# true = 回到顶部按钮里显示滚动百分比。
+rightside_scroll_percent: true
+
+# --------------------------------------
+# 站点交互与统计：复制、阅读量、字数统计、搜索
+# --------------------------------------
+copy:
+  # 文章内容可以一键复制。
+  enable: true
+  copyright:
+    # true = 复制较长文字时自动附带出处；个人博客建议开启。
+    enable: true
+    # 复制超过 150 字时附带版权信息。
+    limit_count: 150
+
+wordcount:
+  # 没装 hexo-wordcount 插件时这里保持 false，避免构建报错。
+  enable: false
+  post_wordcount: true
+  min2read: true
+  total_wordcount: true
+
+busuanzi:
+  # 站点访客数。
+  site_uv: true
+  # 站点访问量。
+  site_pv: true
+  # 文章页访问量。
+  page_pv: true
+
+search:
+  # 暂时不启用搜索；如果后续安装 hexo-generator-search，可改成 local_search。
+  use:
+  placeholder: 搜索文章、标签或关键词
+
+# --------------------------------------
+# 分享与评论：文章底部的社交分享、评论区
+# --------------------------------------
+share:
+  # sharejs = 文章底部社交分享按钮；留空则不显示。
+  use: sharejs
+  sharejs:
+    # 国内读者常用平台优先。
+    sites: wechat,weibo,qq
+
+comments:
+  # 留空 = 不启用评论系统；以后可接入 Giscus / Twikoo / Waline。
+  use:
+  text: true
+  lazyload: true
+  count: false
+  card_post_count: false
+
+# --------------------------------------
+# 视觉美化：主题色、圆角、遮罩、字体、图片灯箱、懒加载、自定义 CSS
+# --------------------------------------
+theme_color:
+  # 开启后影响按钮、分页器、选中文本、目录高亮、滚动条等全站色彩。
+  enable: true
+  # 主色：偏青绿，和首页深蓝星空形成对比，不会过度紫蓝。
+  main: "#2A9D8F"
+  paginator: "#E76F51"
+  button_hover: "#E76F51"
+  text_selection: "#F4A261"
+  link_color: "#287271"
+  meta_color: "#6C757D"
+  hr_color: "#B8DED8"
+  code_foreground: "#D35400"
+  code_background: "rgba(42, 157, 143, .10)"
+  toc_color: "#2A9D8F"
+  blockquote_padding_color: "#E9C46A"
+  blockquote_background_color: "rgba(233, 196, 106, .14)"
+  scrollbar_color: "#2A9D8F"
+  meta_theme_color_light: "#f7fbfa"
+  meta_theme_color_dark: "#15181f"
+
+# 分类页/标签页使用和首页类似的卡片布局。
+category_ui: index
+tag_ui: index
+
+# UI 圆角，影响卡片、按钮、输入框等。
+rounded_corners_ui: true
+
+# false = 不强制两端对齐，中文正文阅读更自然。
+text_align_justify: false
+
+mask:
+  # 首页/文章页顶部图片上加半透明遮罩，保证标题在星空/雪山图片上清晰。
+  header: true
+  # 页脚图片上加半透明遮罩，保证版权文字清晰。
+  footer: true
+
+preloader:
+  # 关闭全屏加载动画，减少等待感。
+  enable: false
+  source: 1
+  pace_css_url:
+
+# 页面进入动画。
+enter_transitions: true
+
+# 默认打开浅色模式；用户可用右下角按钮切换深色。
+display_mode: light
+
+beautify:
+  # 文章正文标题前的小图标美化。
+  enable: true
+  # post = 只影响文章正文，不影响全站标题。
+  field: post
+  # Font Awesome 链接图标，显示在正文 h1/h2/h3 标题前。
+  title_prefix_icon: '\f0c1'
+  title_prefix_icon_color: "#2A9D8F"
+
+font:
+  # 全站基础字号；空值使用主题默认。这里略微放大正文，更适合长文阅读。
+  global_font_size: 16px
+  code_font_size: 14px
+  # 系统字体栈，中文和英文都比较稳。
+  font_family: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+  code_font_family: '"JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", monospace'
+
+blog_title_font:
+  # 首页大标题字体；不额外加载网络字体，避免国内访问慢。
+  font_link:
+  font_family: 'Georgia, "Times New Roman", "Noto Serif SC", serif'
+
+hr_icon:
+  # 文章分割线中间的小图标。
+  enable: true
+  icon:
+  icon_top:
+
+# 图片灯箱：点击文章图片后放大预览。
+lightbox: medium_zoom
+
+lazyload:
+  # 全站图片懒加载，提升首屏速度。
+  enable: true
+  # 使用浏览器原生懒加载，依赖少。
+  native: true
+  field: site
+  placeholder:
+  blur: false
+
+inject:
+  head:
+    # 自定义 CSS：只放少量“主题配置调不到”的细节，例如卡片阴影、正文宽度、导航毛玻璃。
+    - <link rel="stylesheet" href="/css/astery-custom.css">
+  bottom:
+
+# --------------------------------------
+# 页脚：页面最底部版权区
+# --------------------------------------
+footer:
+  nav:
+  owner:
+    # true = 页脚显示 © 年份 作者。
+    enable: true
+    since: 2026
+  copyright:
+    # true = 显示 Hexo / Butterfly 版权信息。
+    enable: true
+    # true = 显示主题版本。
+    version: true
+  # 页脚自定义文案，显示在版权信息附近。
+  custom_text: 用工程笔记保存思考的上下文。

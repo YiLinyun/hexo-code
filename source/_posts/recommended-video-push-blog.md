@@ -1,4 +1,11 @@
-# 推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达
+---
+title: 推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达
+date: 2026-05-16 20:00:00
+tags:
+  - Hexo
+categories:
+  - 博客
+---
 
 这次做的不是“发一条推送”这么简单，而是把推荐视频推送拆成了一条稳定链路：
 

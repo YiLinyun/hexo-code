@@ -1,0 +1,384 @@
+<!DOCTYPE html><html lang="zn-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录 | AsterBlog</title><meta name="author" content="Aster"><meta name="copyright" content="Aster"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这次活动模块包含签到、任务、邀请奖励、抽奖、道具包、流水查询等一组接口。最开始设计时，我很自然地沿着传统 CRUD 的思路往下拆：签到接口自己判断今天是否签到、自己发积分；任务接口自己判断任务是否可领取、自己写任务记录、自己加金币；抽奖接口自己扣金币、自己随机奖品、自己发放奖励；道具接口自己扣库存、自己延长 VIP。 这种写法短期能跑，但很快会遇到一个问题：活动越来越多时，真正复杂的不是接口数量，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录">
+<meta property="og:url" content="http://example.com/2026/06/16/activity-reward-architecture-blog/index.html">
+<meta property="og:site_name" content="AsterBlog">
+<meta property="og:description" content="这次活动模块包含签到、任务、邀请奖励、抽奖、道具包、流水查询等一组接口。最开始设计时，我很自然地沿着传统 CRUD 的思路往下拆：签到接口自己判断今天是否签到、自己发积分；任务接口自己判断任务是否可领取、自己写任务记录、自己加金币；抽奖接口自己扣金币、自己随机奖品、自己发放奖励；道具接口自己扣库存、自己延长 VIP。 这种写法短期能跑，但很快会遇到一个问题：活动越来越多时，真正复杂的不是接口数量，">
+<meta property="og:locale" content="zn_CN">
+<meta property="og:image" content="http://example.com/img/aster-icon.jpg">
+<meta property="article:published_time" content="2026-06-16T02:30:00.000Z">
+<meta property="article:modified_time" content="2026-06-16T02:06:25.065Z">
+<meta property="article:author" content="Aster">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Spring Boot">
+<meta property="article:tag" content="MyBatis">
+<meta property="article:tag" content="活动系统">
+<meta property="article:tag" content="幂等">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/aster-icon.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录",
+  "url": "http://example.com/2026/06/16/activity-reward-architecture-blog/",
+  "image": "http://example.com/img/aster-icon.jpg",
+  "datePublished": "2026-06-16T02:30:00.000Z",
+  "dateModified": "2026-06-16T02:06:25.065Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Aster",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2026/06/16/activity-reward-architecture-blog/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.5-b1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="/img/aster-icon.jpg" alt="Logo"><span class="site-name">AsterBlog</span></a><a class="nav-page-title" href="/"><span class="site-name">从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-06-16T02:30:00.000Z" title="Created 2026-06-16 10:30:00">2026-06-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-06-16T02:06:25.065Z" title="Updated 2026-06-16 10:06:25">2026-06-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84/">后端架构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>这次活动模块包含签到、任务、邀请奖励、抽奖、道具包、流水查询等一组接口。最开始设计时，我很自然地沿着传统 CRUD 的思路往下拆：签到接口自己判断今天是否签到、自己发积分；任务接口自己判断任务是否可领取、自己写任务记录、自己加金币；抽奖接口自己扣金币、自己随机奖品、自己发放奖励；道具接口自己扣库存、自己延长 VIP。</p>
+<p>这种写法短期能跑，但很快会遇到一个问题：活动越来越多时，真正复杂的不是接口数量，而是“奖励怎么发”和“资产怎么扣”。如果每个接口都各写一套加积分、加 VIP、加道具、扣积分、扣道具、写流水、处理幂等的逻辑，代码会迅速变成一堆看起来相似、细节又不完全一致的业务分支。</p>
+<p>所以后面我不断和 AI 沟通，把架构从“一个接口一套 CRUD”调整成了现在的模式：业务接口只负责编排，核心资产动作收敛到两个服务。</p>
+<ul>
+<li><code>ActivityRewardGrantService</code>：统一处理发奖。</li>
+<li><code>UserAssetConsumeService</code>：统一处理资产消耗。</li>
+</ul>
+<p>抽奖、签到、任务、邀请奖励、道具使用都围绕这两个服务展开。接口层变薄了，复杂度被压到更稳定、更容易测试和复用的服务层里。</p>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>新活动接口集中在 <code>ActivityController</code> 下，路径是 <code>/apiV2/activity</code>。控制器主要做四件事：</p>
+<ol>
+<li>通过 <code>RequestUtils.getPublicId()</code> 找到当前用户。</li>
+<li>做必要的参数校验，比如 <code>taskId</code>、<code>requestNo</code>、<code>changeType</code>。</li>
+<li>调用活动服务完成业务。</li>
+<li>记录请求和耗时日志，包装 <code>AjaxResult</code> 返回。</li>
+</ol>
+<p>控制器没有直接操作积分、VIP、道具库存，也没有把发奖逻辑写在接口里。比如任务奖励接口最终调用的是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">activityRewardGrantService.grantTaskReward(currentUser, taskId, taskDate)</span><br></pre></td></tr></table></figure>
+
+<p>抽奖接口调用的是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lotteryService.lotteryDraw(currentUser, requestNo)</span><br></pre></td></tr></table></figure>
+
+<p>而 <code>LotteryService</code> 内部也不直接写积分和道具，而是先调用消耗服务扣资产，再调用发奖服务发放奖励：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">userAssetConsumeService.consumeProp(...)</span><br><span class="line">userAssetConsumeService.consumePoints(...)</span><br><span class="line">activityRewardGrantService.grantGenericReward(...)</span><br></pre></td></tr></table></figure>
+
+<p>这样整个活动系统的分层大致是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ActivityController</span><br><span class="line">  -&gt; ActivityProfileService       查询个人中心、签到、道具包</span><br><span class="line">  -&gt; ActivityRewardGrantService   统一发奖</span><br><span class="line">  -&gt; UserAssetConsumeService      统一消耗</span><br><span class="line">  -&gt; LotteryService               抽奖编排</span><br><span class="line">  -&gt; PropUseService               道具使用编排</span><br><span class="line">  -&gt; InviteCodeService            邀请码绑定</span><br></pre></td></tr></table></figure>
+
+<p>这里最关键的变化是：签到、任务、抽奖、邀请不再各自实现一套“奖励落库逻辑”，而是把奖励抽象成统一的 <code>TaskRewardItem</code>。不管来源是任务奖励、签到奖励还是抽奖奖品，只要最终能表达成“奖励类型 + 数量 + 道具 ID + 单位”，就可以交给同一个发奖服务处理。</p>
+<h2 id="表结构设计"><a href="#表结构设计" class="headerlink" title="表结构设计"></a>表结构设计</h2><p>这套活动系统的表设计不是围绕接口设计的，而是围绕“配置、用户状态、业务记录、资产流水”来设计。</p>
+<h3 id="任务配置表：vt-task"><a href="#任务配置表：vt-task" class="headerlink" title="任务配置表：vt_task"></a>任务配置表：<code>vt_task</code></h3><p><code>vt_task</code> 保存活动任务配置。任务不只是普通每日任务，也可以承载签到奖励、邀请奖励等活动配置。表里最重要的是任务类型、周期类型和奖励配置。</p>
+<p>比如任务可以分成：</p>
+<ul>
+<li>每日任务：每天可完成一次。</li>
+<li>生命周期任务：整个用户生命周期只可完成一次。</li>
+<li>活动任务：用于签到、邀请等特殊业务的奖励配置。</li>
+</ul>
+<p>这样做的好处是，奖励规则可以配置化。接口不需要写死“第几天签到发多少积分”，而是可以通过任务配置找到对应奖励，再交给统一发奖服务。</p>
+<h3 id="用户任务记录表：vt-user-task"><a href="#用户任务记录表：vt-user-task" class="headerlink" title="用户任务记录表：vt_user_task"></a>用户任务记录表：<code>vt_user_task</code></h3><p><code>vt_user_task</code> 是用户领取任务奖励后的业务记录。它记录用户、任务、奖励快照、任务日期等信息。</p>
+<p>这里有一个非常重要的设计：用唯一索引保证任务领取幂等。</p>
+<p>对于每日任务，唯一维度可以是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user_id + task_id + task_date</span><br></pre></td></tr></table></figure>
+
+<p>对于生命周期任务，<code>task_date</code> 可以为空或使用固定语义，由业务周期来约束。代码里在插入 <code>vt_user_task</code> 时捕获 <code>DuplicateKeyException</code>，如果并发请求同时进来，只有一个请求能插入成功，另一个请求会被唯一索引挡住，然后返回“奖励已领取”。</p>
+<p>这个设计比“先查有没有，再决定要不要插入”更可靠。因为在并发场景下，两个请求可能同时查到没有记录，然后同时发奖。真正可靠的边界应该放在数据库唯一索引上。</p>
+<h3 id="签到记录表：vt-user-checkin"><a href="#签到记录表：vt-user-checkin" class="headerlink" title="签到记录表：vt_user_checkin"></a>签到记录表：<code>vt_user_checkin</code></h3><p>签到也不是只更新一个用户字段，而是单独保留签到记录。核心字段包括：</p>
+<ul>
+<li><code>user_id</code></li>
+<li><code>checkin_date</code></li>
+<li><code>cycle_day</code></li>
+<li><code>total_checkin_days</code></li>
+<li><code>task_id</code></li>
+<li><code>reward_snapshot</code></li>
+<li><code>create_time</code></li>
+<li><code>update_time</code></li>
+</ul>
+<p>其中 <code>user_id + checkin_date</code> 应该有唯一索引，代码里也是先插入签到记录，再发奖励。这个顺序很关键：先让数据库确认“今天这次签到是唯一的”，再进入发奖链路。</p>
+<p>签到成功后，再回写本次签到的周期天数、累计签到天数、关联任务 ID 和奖励快照。这样后续排查时，不需要重新推导当时发了什么，直接看签到记录即可。</p>
+<h3 id="道具配置表：vt-prop"><a href="#道具配置表：vt-prop" class="headerlink" title="道具配置表：vt_prop"></a>道具配置表：<code>vt_prop</code></h3><p><code>vt_prop</code> 是道具定义表。抽奖奖品里如果抽中道具，只记录 <code>propId</code>，真正的道具名称、类型、效果以 <code>vt_prop</code> 为准。</p>
+<p>这个细节很有价值。早期很容易把奖品名、道具名散落在代码和配置里，最后出现“抽奖配置叫 vip_card_2h，但道具表叫 2小时VIP卡”的不一致。现在统一以道具表为准，发奖服务只关心 <code>propId</code>，展示层再按道具配置取名称。</p>
+<h3 id="用户道具表：vt-user-prop"><a href="#用户道具表：vt-user-prop" class="headerlink" title="用户道具表：vt_user_prop"></a>用户道具表：<code>vt_user_prop</code></h3><p><code>vt_user_prop</code> 保存用户拥有的道具数量。核心字段包括：</p>
+<ul>
+<li><code>user_id</code></li>
+<li><code>prop_id</code></li>
+<li><code>quantity</code></li>
+<li><code>is_new</code></li>
+<li><code>expire_time</code></li>
+<li><code>create_time</code></li>
+</ul>
+<p>发放道具和消耗道具都会操作这张表。并发控制上，代码使用 <code>select ... for update</code> 锁定用户某个道具的行，再更新数量。</p>
+<p>如果发奖时用户还没有这类道具，会先插入一条 <code>vt_user_prop</code>。这里同样需要依赖 <code>user_id + prop_id</code> 的唯一索引：并发发放同一个道具时，可能两个事务都发现没有记录，然后同时插入。代码捕获 <code>DuplicateKeyException</code> 后重新 <code>selectForUpdate</code>，再做数量累加。</p>
+<h3 id="统一流水表：vt-ledger"><a href="#统一流水表：vt-ledger" class="headerlink" title="统一流水表：vt_ledger"></a>统一流水表：<code>vt_ledger</code></h3><p><code>vt_ledger</code> 是整个活动系统最核心的审计表。积分增加、积分消耗、VIP 增加、道具发放、道具消耗、勋章发放都会写流水。</p>
+<p>关键字段包括：</p>
+<ul>
+<li><code>user_id</code>：用户 ID。</li>
+<li><code>prop_id</code>：如果是道具相关流水，记录道具 ID。</li>
+<li><code>biz_type</code>：业务来源，比如 <code>task</code>、<code>checkin</code>、<code>lottery</code>、<code>invite</code>。</li>
+<li><code>biz_id</code>：业务记录 ID，比如 <code>userTaskId</code> 或抽奖的 <code>requestNo</code>。</li>
+<li><code>reward_type</code>：资产或奖励类型，比如 <code>point</code>、<code>prop</code>、<code>vip_time</code>、勋章类型。</li>
+<li><code>change_type</code>：<code>add</code> 或 <code>sub</code>。</li>
+<li><code>change_quantity</code>：变化数量。</li>
+<li><code>balance_after</code>：变化后的余额。</li>
+<li><code>vip_time_before</code> &#x2F; <code>vip_time_after</code>：VIP 时间变动前后的快照。</li>
+<li><code>create_time</code>：流水创建时间。</li>
+</ul>
+<p>这张表解决了两个问题：</p>
+<p>第一，用户资产变化可以追踪。出了问题可以查“这笔积分为什么加了”“这个道具什么时候扣了”。</p>
+<p>第二，报表可以统一从流水聚合。活动报表不需要分别统计签到表、任务表、抽奖表、邀请表，而是可以按 <code>biz_type</code>、<code>reward_type</code>、<code>change_type</code> 聚合金币发放、金币消耗、道具发放等指标。</p>
+<h2 id="发奖服务：把奖励动作收敛成一个入口"><a href="#发奖服务：把奖励动作收敛成一个入口" class="headerlink" title="发奖服务：把奖励动作收敛成一个入口"></a>发奖服务：把奖励动作收敛成一个入口</h2><p><code>ActivityRewardGrantService</code> 是这套架构里最重要的服务之一。它提供两个核心入口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GrantRewardResult <span class="title function_">grantTaskReward</span><span class="params">(PocklyUser user, Long taskId, LocalDate taskDate)</span></span><br><span class="line"></span><br><span class="line">GrantRewardResult <span class="title function_">grantGenericReward</span><span class="params">(PocklyUser user, String bizType, Long bizId, List&lt;TaskRewardItem&gt; rewardItems)</span></span><br></pre></td></tr></table></figure>
+
+<p><code>grantTaskReward</code> 面向任务领取场景。它会读取任务配置，判断任务周期，插入 <code>vt_user_task</code>，然后调用内部的 <code>doGrantReward</code> 发放奖励。</p>
+<p><code>grantGenericReward</code> 面向通用发奖场景。抽奖、邀请、一些非任务来源的活动都可以直接构造 <code>TaskRewardItem</code>，然后调用这个方法。</p>
+<p>内部真正的发奖逻辑会按奖励类型分发：</p>
+<ul>
+<li><code>point</code>：更新用户积分，写 <code>vt_ledger</code>。</li>
+<li><code>vip_time</code>：延长用户 VIP 时间，写 VIP 时间前后快照。</li>
+<li><code>prop</code>：更新用户道具数量，写道具流水。</li>
+<li>medal 类奖励：不改余额，只写获得记录。</li>
+</ul>
+<p>这个抽象带来的最大收益是：以后新增一个活动，不需要重新写“怎么加积分、怎么发道具、怎么写流水”。新的业务只需要回答三个问题：</p>
+<ol>
+<li>这次发奖的 <code>bizType</code> 是什么？</li>
+<li>这次发奖的 <code>bizId</code> 是什么？</li>
+<li>这次发哪些 <code>TaskRewardItem</code>？</li>
+</ol>
+<p>回答完这三个问题，就可以复用统一发奖链路。</p>
+<h2 id="资产消耗服务：扣积分和扣道具也必须统一"><a href="#资产消耗服务：扣积分和扣道具也必须统一" class="headerlink" title="资产消耗服务：扣积分和扣道具也必须统一"></a>资产消耗服务：扣积分和扣道具也必须统一</h2><p>和发奖相反，<code>UserAssetConsumeService</code> 负责资产消耗。它提供三个入口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ConsumeAssetResult <span class="title function_">consume</span><span class="params">(ConsumeAssetRequest request)</span></span><br><span class="line"></span><br><span class="line">ConsumeAssetResult <span class="title function_">consumePoints</span><span class="params">(Long userId, Integer quantity, String bizType, Long bizId)</span></span><br><span class="line"></span><br><span class="line">ConsumeAssetResult <span class="title function_">consumeProp</span><span class="params">(Long userId, Long propId, Integer quantity, String bizType, Long bizId)</span></span><br></pre></td></tr></table></figure>
+
+<p>积分消耗会检查用户积分余额，扣减后写一条 <code>change_type = sub</code> 的流水。道具消耗会 <code>selectForUpdate</code> 锁定用户道具行，检查数量是否足够，扣减后同样写流水。</p>
+<p>统一消耗服务的意义和统一发奖服务一样：消耗动作本身是资产系统的核心能力，不应该散落在抽奖、道具使用、兑换等各个接口里。</p>
+<p>比如抽奖优先消耗抽奖券，没有抽奖券再扣 100 积分。这个判断属于抽奖业务，但“扣抽奖券”和“扣积分”不属于抽奖业务，应该交给消耗服务。</p>
+<h2 id="抽奖服务：编排消耗、随机和发奖"><a href="#抽奖服务：编排消耗、随机和发奖" class="headerlink" title="抽奖服务：编排消耗、随机和发奖"></a>抽奖服务：编排消耗、随机和发奖</h2><p><code>LotteryService</code> 的职责是编排，而不是亲自改资产。</p>
+<p>一次抽奖大概分为几步：</p>
+<ol>
+<li>校验 <code>requestNo</code>。</li>
+<li>先查 Redis 结果缓存，如果相同请求已经成功过，直接返回历史结果。</li>
+<li>用 <code>userId + requestNo</code> 加 Redis 短锁，避免同一个请求号并发执行。</li>
+<li>判断优先使用抽奖券还是积分。</li>
+<li>调用 <code>UserAssetConsumeService</code> 扣道具或扣积分。</li>
+<li>按权重随机奖品。</li>
+<li>把奖品转换成 <code>TaskRewardItem</code>。</li>
+<li>调用 <code>ActivityRewardGrantService.grantGenericReward</code> 发奖。</li>
+<li>事务提交后缓存抽奖结果，方便客户端重试时拿到同样结果。</li>
+</ol>
+<p>奖品配置目前是代码里的权重定义：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">10~30 积分：权重 55</span><br><span class="line">50~70 积分：权重 15</span><br><span class="line">80 积分：权重 5</span><br><span class="line">下载券：权重 15</span><br><span class="line">2小时 VIP 道具卡：权重 9</span><br><span class="line">1天 VIP 道具卡：权重 1</span><br></pre></td></tr></table></figure>
+
+<p>抽奖随机使用 <code>ThreadLocalRandom</code>。随机积分奖品不是固定值，而是在配置的最小值和最大值之间再随机一次。比如抽中“10~30积分”后，实际发放值会在 10 到 30 之间生成。</p>
+<p>这里有一个设计点：抽奖的 <code>bizId</code> 使用 <code>requestNo</code>。这样扣资产流水和发奖流水都能通过 <code>biz_type = lottery</code>、<code>biz_id = requestNo</code> 串起来。排查某次抽奖时，不需要额外的抽奖记录表也能看到这次请求扣了什么、发了什么。</p>
+<h2 id="道具使用：消耗和效果分开"><a href="#道具使用：消耗和效果分开" class="headerlink" title="道具使用：消耗和效果分开"></a>道具使用：消耗和效果分开</h2><p>道具使用比普通扣道具多一步：扣完道具之后，还要应用道具效果。</p>
+<p><code>PropUseService</code> 做的事情是：</p>
+<ol>
+<li>用 <code>requestNo</code> 做幂等。</li>
+<li>加 Redis 短锁。</li>
+<li>调用 <code>UserAssetConsumeService.consumeProp</code> 扣道具。</li>
+<li>如果道具是 VIP 卡，调用 <code>VipCardHandler</code> 延长 VIP。</li>
+<li>返回道具余额、VIP 到期时间、消耗流水 ID、效果流水 ID。</li>
+</ol>
+<p>这里“消耗”和“效果”是两个概念。扣掉一张 VIP 卡是资产消耗，延长 VIP 时间是效果应用。两者都需要有记录，所以结果里会区分：</p>
+<ul>
+<li><code>consumeLedgerId</code>：扣道具流水。</li>
+<li><code>effectLedgerId</code>：应用 VIP 效果产生的流水。</li>
+</ul>
+<p>如果中间失败，代码会把异常阶段、请求参数、错误信息记录到 Redis，并保留 30 天，方便后续排查。这个设计比只打一行错误日志更可靠，因为线上问题经常不是立刻发现的，日志可能已经滚动，但异常数据还可以按业务 key 找回来。</p>
+<h2 id="幂等设计：不要只相信接口层判断"><a href="#幂等设计：不要只相信接口层判断" class="headerlink" title="幂等设计：不要只相信接口层判断"></a>幂等设计：不要只相信接口层判断</h2><p>活动系统最怕重复发奖和重复扣资产。前端重试、网络超时、用户连点、网关重放、服务端并发都可能导致同一业务被执行多次。</p>
+<p>这套代码里用了几种不同层次的幂等手段。</p>
+<h3 id="1-数据库唯一索引兜底"><a href="#1-数据库唯一索引兜底" class="headerlink" title="1. 数据库唯一索引兜底"></a>1. 数据库唯一索引兜底</h3><p>签到依赖：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user_id + checkin_date</span><br></pre></td></tr></table></figure>
+
+<p>任务领取依赖：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user_id + task_id + task_date</span><br></pre></td></tr></table></figure>
+
+<p>用户道具持仓依赖：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user_id + prop_id</span><br></pre></td></tr></table></figure>
+
+<p>邀请绑定也类似，老 SQL 中可以看到 <code>inviter_id + invitee_id</code> 的唯一约束。</p>
+<p>数据库唯一索引是最终防线。即使 Redis 锁失效、接口重复提交、应用多实例并发，只要写入同一条业务记录，数据库就能挡住重复插入。</p>
+<h3 id="2-Redis-短锁降低并发冲突"><a href="#2-Redis-短锁降低并发冲突" class="headerlink" title="2. Redis 短锁降低并发冲突"></a>2. Redis 短锁降低并发冲突</h3><p>抽奖和道具使用都使用了 <code>userId + requestNo</code> 的 Redis lock key。</p>
+<p>这个锁不是为了替代数据库事务，而是为了让同一个请求号不要并发执行两次。它更像是用户体验层和应用层的保护：如果第二个请求马上进来，要么拿到已缓存结果，要么得到“处理中”的提示，而不是打到数据库里争抢。</p>
+<h3 id="3-结果缓存支持客户端重试"><a href="#3-结果缓存支持客户端重试" class="headerlink" title="3. 结果缓存支持客户端重试"></a>3. 结果缓存支持客户端重试</h3><p>抽奖和道具使用成功后，会把结果按 <code>userId + requestNo</code> 缓存几天。客户端如果因为网络超时重试，同一个 <code>requestNo</code> 可以拿到相同结果。</p>
+<p>这点对抽奖尤其重要。如果没有结果缓存，用户第一次请求其实已经抽中了奖励，但响应丢了；第二次请求又重新随机一次，就会造成体验和资产记录都不一致。</p>
+<h3 id="4-行锁保证余额更新正确"><a href="#4-行锁保证余额更新正确" class="headerlink" title="4. 行锁保证余额更新正确"></a>4. 行锁保证余额更新正确</h3><p>道具扣减和道具发放使用 <code>selectForUpdate</code> 锁定 <code>vt_user_prop</code> 的具体行。这样同一个用户同一个道具的并发增减会串行化，避免余额覆盖。</p>
+<p>积分更新目前是读取用户积分后计算 <code>afterPoints</code>，再调用更新方法写回。这里也要注意并发风险：如果未来积分消耗和发放并发更高，最好进一步升级为数据库原子更新，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> vt_pockly_user</span><br><span class="line"><span class="keyword">set</span> points <span class="operator">=</span> points <span class="operator">-</span> #&#123;quantity&#125;</span><br><span class="line"><span class="keyword">where</span> id <span class="operator">=</span> #&#123;userId&#125;</span><br><span class="line">  <span class="keyword">and</span> points <span class="operator">&gt;=</span> #&#123;quantity&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后通过影响行数判断余额是否足够。这样可以减少“读余额、算余额、写余额”之间的并发窗口。</p>
+<h2 id="事务边界：业务记录、资产变更、流水必须同生共死"><a href="#事务边界：业务记录、资产变更、流水必须同生共死" class="headerlink" title="事务边界：业务记录、资产变更、流水必须同生共死"></a>事务边界：业务记录、资产变更、流水必须同生共死</h2><p>发奖服务和消耗服务都使用了事务。原因很简单：业务记录、资产余额、流水记录必须保持一致。</p>
+<p>任务领取时，不能出现 <code>vt_user_task</code> 插入成功但积分没加的情况；抽奖时，也不能出现积分扣了但奖励没发的情况；道具使用时，不能出现道具扣了但 VIP 效果没应用又没有异常记录的情况。</p>
+<p>所以关键服务方法都用事务包起来：</p>
+<ul>
+<li><code>grantTaskReward</code></li>
+<li><code>grantGenericReward</code></li>
+<li><code>consume</code></li>
+<li><code>consumePoints</code></li>
+<li><code>consumeProp</code></li>
+<li><code>lotteryDraw</code></li>
+<li><code>useProp</code></li>
+</ul>
+<p>另外，抽奖和道具使用的结果缓存要注意事务提交时机。代码里不是在业务刚执行完就盲目缓存，而是注册事务同步，在事务提交后再缓存结果。如果事务最后回滚了，却提前把成功结果写进 Redis，会导致客户端拿到一个数据库里并不存在的成功状态。</p>
+<h2 id="日志和可观测性"><a href="#日志和可观测性" class="headerlink" title="日志和可观测性"></a>日志和可观测性</h2><p>这次活动模块里日志打得比较细，每个关键接口都会记录：</p>
+<ul>
+<li><code>userId</code></li>
+<li><code>taskId</code></li>
+<li><code>requestNo</code></li>
+<li><code>bizType</code></li>
+<li><code>bizId</code></li>
+<li>奖励摘要</li>
+<li>流水 ID</li>
+<li>余额变化</li>
+<li>耗时</li>
+</ul>
+<p>比如抽奖成功日志会包含扣了什么资产、消耗流水 ID、发奖流水 ID、奖励摘要。任务发奖日志会包含任务 ID、用户任务记录 ID、奖励列表、最终积分和 VIP 时间。</p>
+<p>这些日志对活动系统特别重要。活动问题通常不是“接口报错”这么简单，而是用户会问：“我刚才抽奖为什么没到账？”、“我签到奖励是不是少了？”、“我用了 VIP 卡为什么时间没加？” 如果日志和流水设计完整，排查路径会短很多。</p>
+<h2 id="AI-参与架构优化的收获"><a href="#AI-参与架构优化的收获" class="headerlink" title="AI 参与架构优化的收获"></a>AI 参与架构优化的收获</h2><p>这次开发中，我觉得 AI 最大的价值不是帮我写某一段 CRUD，而是帮我不断追问架构边界。</p>
+<p>一开始我会倾向于问：“帮我写一个签到接口”“帮我写一个抽奖接口”。如果按这个方向继续，很容易得到很多能跑但重复的代码。后来沟通重点变成：</p>
+<ul>
+<li>签到、任务、邀请、抽奖的共同点是什么？</li>
+<li>哪些逻辑应该属于业务编排，哪些应该属于资产服务？</li>
+<li>奖励能不能抽象成统一模型？</li>
+<li>消耗能不能抽象成统一模型？</li>
+<li>重复发奖用什么兜底？</li>
+<li>失败后怎么排查？</li>
+<li>以后新增活动时，哪些代码不应该再改？</li>
+</ul>
+<p>当问题从“写接口”变成“找稳定边界”后，架构自然就从接口 CRUD 走向了服务复用。</p>
+<p>最后形成的结构是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">业务接口负责表达场景</span><br><span class="line">活动服务负责编排流程</span><br><span class="line">发奖服务负责所有正向资产变化</span><br><span class="line">消耗服务负责所有负向资产变化</span><br><span class="line">流水表负责审计和报表</span><br><span class="line">唯一索引、Redis 锁、结果缓存共同保证幂等</span><br></pre></td></tr></table></figure>
+
+<p>这个结构不是最复杂的，也不是为了设计而设计。它解决的是活动系统里最实际的问题：奖励类型会变，活动玩法会变，但资产发放和资产消耗必须稳定、统一、可追踪。</p>
+<h2 id="后续可以继续优化的点"><a href="#后续可以继续优化的点" class="headerlink" title="后续可以继续优化的点"></a>后续可以继续优化的点</h2><p>现在这套架构已经比最初的 CRUD 模式清晰很多，但后续还有几个方向可以继续演进。</p>
+<p>第一，奖品配置可以从代码迁移到数据库或配置中心。当前抽奖权重写在代码里，发布成本比较高。如果运营需要频繁调整概率，应该做成可配置。</p>
+<p>第二，积分更新可以进一步原子化。尤其是抽奖、任务、签到都上线后，积分并发变化会更多，原子 SQL 或乐观锁版本号会更稳。</p>
+<p>第三，流水表可以增加更严格的业务唯一键。例如对部分业务可以增加 <code>user_id + biz_type + biz_id + reward_type + change_type</code> 的唯一约束，进一步防止同一业务重复写流水。</p>
+<p>第四，异常补偿可以产品化。现在道具使用失败会记录 Redis 异常数据，后续可以做一个后台页面，支持查看、筛选、人工补偿或标记处理。</p>
+<p>第五，活动配置可以统一模型化。签到、任务、邀请、抽奖目前已经共享发奖能力，未来还可以继续抽象活动配置、参与条件、奖励规则、风控条件，让活动系统从“接口集合”进一步演进为“活动平台”。</p>
+<p>这次重构最重要的经验是：活动系统不要被接口表象骗了。签到、任务、抽奖看起来是三个功能，本质上都是围绕用户资产变化展开的业务。只要抓住“发奖”和“消耗”这两个核心动作，再用流水、唯一索引、事务和缓存把边界守住，整个系统就会从一堆分散接口，变成一个可以继续生长的活动架构。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Aster</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2026/06/16/activity-reward-architecture-blog/">http://example.com/2026/06/16/activity-reward-architecture-blog/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/Spring-Boot/">Spring Boot</a><a class="post-meta__tags" href="/tags/MyBatis/">MyBatis</a><a class="post-meta__tags" href="/tags/%E6%B4%BB%E5%8A%A8%E7%B3%BB%E7%BB%9F/">活动系统</a><a class="post-meta__tags" href="/tags/%E5%B9%82%E7%AD%89/">幂等</a><a class="post-meta__tags" href="/tags/Redis/">Redis</a></div><div class="post-share"><div class="social-share" data-image="/img/aster-icon.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/05/16/recommended-video-push-blog/" title="推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达</div></div><div class="info-2"><div class="info-item-1">这次做的不是“发一条推送”这么简单，而是把推荐视频推送拆成了一条稳定链路： recommendedVideoPushJob -&gt; RecommendVideoPushProducer -&gt; RecommendVideoPushConsumer -&gt; RecommendVideoPushService -&gt; FCM 核心目标就一句话：  把“合适的视频”在“合适的本地时间”推给“合适的用户”，同时尽量别重复、别打扰、别把系统自己搞炸。   一、为什么这事不能直接定时查库然后发一开始最容易想到的写法是：  Quartz 定时跑一遍 扫用户 满足条件就直接调 FCM  这个思路看起来直给，实际上问题一堆：  用户分布在不同时区，服务器时间不等于用户时间 推送窗口有午间、晚间，不是“查到就发” 同一个用户不能被重复塞进队列，更不能被重复推送 推荐视频是动态列表，还得跳过已经播放过的 图片要先转存 CDN，FCM 发的不是一串字，是一条能点、能看、能落地的消息  所以最后我把它拆成了“任务只负责排期，消费才负责执行”的两段式架构。这样系统不需要每分钟硬发消息，只需要...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/aster-icon.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Aster</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">整体架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A8%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="toc-number">2.</span> <span class="toc-text">表结构设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E9%85%8D%E7%BD%AE%E8%A1%A8%EF%BC%9Avt-task"><span class="toc-number">2.1.</span> <span class="toc-text">任务配置表：vt_task</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E4%BB%BB%E5%8A%A1%E8%AE%B0%E5%BD%95%E8%A1%A8%EF%BC%9Avt-user-task"><span class="toc-number">2.2.</span> <span class="toc-text">用户任务记录表：vt_user_task</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%BE%E5%88%B0%E8%AE%B0%E5%BD%95%E8%A1%A8%EF%BC%9Avt-user-checkin"><span class="toc-number">2.3.</span> <span class="toc-text">签到记录表：vt_user_checkin</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%81%93%E5%85%B7%E9%85%8D%E7%BD%AE%E8%A1%A8%EF%BC%9Avt-prop"><span class="toc-number">2.4.</span> <span class="toc-text">道具配置表：vt_prop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E9%81%93%E5%85%B7%E8%A1%A8%EF%BC%9Avt-user-prop"><span class="toc-number">2.5.</span> <span class="toc-text">用户道具表：vt_user_prop</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%9F%E4%B8%80%E6%B5%81%E6%B0%B4%E8%A1%A8%EF%BC%9Avt-ledger"><span class="toc-number">2.6.</span> <span class="toc-text">统一流水表：vt_ledger</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%91%E5%A5%96%E6%9C%8D%E5%8A%A1%EF%BC%9A%E6%8A%8A%E5%A5%96%E5%8A%B1%E5%8A%A8%E4%BD%9C%E6%94%B6%E6%95%9B%E6%88%90%E4%B8%80%E4%B8%AA%E5%85%A5%E5%8F%A3"><span class="toc-number">3.</span> <span class="toc-text">发奖服务：把奖励动作收敛成一个入口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E4%BA%A7%E6%B6%88%E8%80%97%E6%9C%8D%E5%8A%A1%EF%BC%9A%E6%89%A3%E7%A7%AF%E5%88%86%E5%92%8C%E6%89%A3%E9%81%93%E5%85%B7%E4%B9%9F%E5%BF%85%E9%A1%BB%E7%BB%9F%E4%B8%80"><span class="toc-number">4.</span> <span class="toc-text">资产消耗服务：扣积分和扣道具也必须统一</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%BD%E5%A5%96%E6%9C%8D%E5%8A%A1%EF%BC%9A%E7%BC%96%E6%8E%92%E6%B6%88%E8%80%97%E3%80%81%E9%9A%8F%E6%9C%BA%E5%92%8C%E5%8F%91%E5%A5%96"><span class="toc-number">5.</span> <span class="toc-text">抽奖服务：编排消耗、随机和发奖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%93%E5%85%B7%E4%BD%BF%E7%94%A8%EF%BC%9A%E6%B6%88%E8%80%97%E5%92%8C%E6%95%88%E6%9E%9C%E5%88%86%E5%BC%80"><span class="toc-number">6.</span> <span class="toc-text">道具使用：消耗和效果分开</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%82%E7%AD%89%E8%AE%BE%E8%AE%A1%EF%BC%9A%E4%B8%8D%E8%A6%81%E5%8F%AA%E7%9B%B8%E4%BF%A1%E6%8E%A5%E5%8F%A3%E5%B1%82%E5%88%A4%E6%96%AD"><span class="toc-number">7.</span> <span class="toc-text">幂等设计：不要只相信接口层判断</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E5%85%9C%E5%BA%95"><span class="toc-number">7.1.</span> <span class="toc-text">1. 数据库唯一索引兜底</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Redis-%E7%9F%AD%E9%94%81%E9%99%8D%E4%BD%8E%E5%B9%B6%E5%8F%91%E5%86%B2%E7%AA%81"><span class="toc-number">7.2.</span> <span class="toc-text">2. Redis 短锁降低并发冲突</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%BB%93%E6%9E%9C%E7%BC%93%E5%AD%98%E6%94%AF%E6%8C%81%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%87%8D%E8%AF%95"><span class="toc-number">7.3.</span> <span class="toc-text">3. 结果缓存支持客户端重试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%A1%8C%E9%94%81%E4%BF%9D%E8%AF%81%E4%BD%99%E9%A2%9D%E6%9B%B4%E6%96%B0%E6%AD%A3%E7%A1%AE"><span class="toc-number">7.4.</span> <span class="toc-text">4. 行锁保证余额更新正确</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1%E8%BE%B9%E7%95%8C%EF%BC%9A%E4%B8%9A%E5%8A%A1%E8%AE%B0%E5%BD%95%E3%80%81%E8%B5%84%E4%BA%A7%E5%8F%98%E6%9B%B4%E3%80%81%E6%B5%81%E6%B0%B4%E5%BF%85%E9%A1%BB%E5%90%8C%E7%94%9F%E5%85%B1%E6%AD%BB"><span class="toc-number">8.</span> <span class="toc-text">事务边界：业务记录、资产变更、流水必须同生共死</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E5%92%8C%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7"><span class="toc-number">9.</span> <span class="toc-text">日志和可观测性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AI-%E5%8F%82%E4%B8%8E%E6%9E%B6%E6%9E%84%E4%BC%98%E5%8C%96%E7%9A%84%E6%94%B6%E8%8E%B7"><span class="toc-number">10.</span> <span class="toc-text">AI 参与架构优化的收获</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%BB%AD%E5%8F%AF%E4%BB%A5%E7%BB%A7%E7%BB%AD%E4%BC%98%E5%8C%96%E7%9A%84%E7%82%B9"><span class="toc-number">11.</span> <span class="toc-text">后续可以继续优化的点</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/16/activity-reward-architecture-blog/" title="从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录">从 CRUD 到统一发奖与资产消耗：一次活动系统架构重构记录</a><time datetime="2026-06-16T02:30:00.000Z" title="Created 2026-06-16 10:30:00">2026-06-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/16/recommended-video-push-blog/" title="推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达">推荐视频推送链路：从 Quartz 扫描到 RocketMQ 延迟投递，再到 FCM 触达</a><time datetime="2026-05-16T12:00:00.000Z" title="Created 2026-05-16 20:00:00">2026-05-16</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Aster</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.5-b1</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.5-b1"></script><script src="/js/main.js?v=5.5.5-b1"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
